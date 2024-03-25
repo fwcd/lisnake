@@ -14,6 +14,7 @@ mod model;
 mod updater;
 
 #[derive(Parser)]
+#[command(version)]
 struct Args {
     /// The username.
     #[arg(short, long, env = "LIGHTHOUSE_USER")]
