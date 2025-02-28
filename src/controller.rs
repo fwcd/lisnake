@@ -18,7 +18,14 @@ pub async fn run(mut stream: impl Stream<Item = lighthouse_client::Result<Server
                     Some(39) => Some(Delta::RIGHT),
                     Some(40) => Some(Delta::DOWN),
                     _ => None,
-                };
+                }.or(match event.button {
+                    // Per https://w3c.github.io/gamepad/#remapping
+                    Some(12) => Some(Delta::UP),
+                    Some(13) => Some(Delta::DOWN),
+                    Some(14) => Some(Delta::LEFT),
+                    Some(15) => Some(Delta::RIGHT),
+                    _ => None,
+                });
 
                 // Update the snake's direction
                 if let Some(dir) = opt_dir {
