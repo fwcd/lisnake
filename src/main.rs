@@ -39,10 +39,10 @@ async fn main() -> Result<()> {
     let lh = Lighthouse::connect_with_tokio_to(&args.url, auth).await?;
     info!("Connected to the Lighthouse server");
 
-    let stream = lh.stream_model().await?;
+    let input = lh.stream_input().await?;
 
     let updater_handle = task::spawn(updater::run(lh, state.clone()));
-    let controller_handle = task::spawn(controller::run(stream, state));
+    let controller_handle = task::spawn(controller::run(input, state));
 
     updater_handle.await.unwrap()?;
     controller_handle.await.unwrap()?;
