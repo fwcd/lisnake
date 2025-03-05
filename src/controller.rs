@@ -10,7 +10,7 @@ use crate::model::State;
 pub async fn run(mut stream: impl Stream<Item = lighthouse_client::Result<ServerMessage<InputEvent>>> + Unpin, shared_state: Arc<Mutex<State>>) -> Result<()> {
     while let Some(msg) = stream.next().await {
         let opt_dir = match msg?.payload {
-            InputEvent::Key(KeyEvent { key, down, .. }) if down => match key.as_str() {
+            InputEvent::Key(KeyEvent { code, down, .. }) if down => match code.as_str() {
                 "ArrowLeft" => Some(Delta::LEFT),
                 "ArrowUp" => Some(Delta::UP),
                 "ArrowRight" => Some(Delta::RIGHT),
