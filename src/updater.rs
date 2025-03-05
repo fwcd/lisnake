@@ -8,7 +8,7 @@ use tracing::debug;
 
 use crate::{constants::UPDATE_INTERVAL, model::State};
 
-pub async fn run(mut lh: Lighthouse<TokioWebSocket>, shared_state: Arc<Mutex<State>>) -> Result<()> {
+pub async fn run(lh: Lighthouse<TokioWebSocket>, shared_state: Arc<Mutex<State>>) -> Result<()> {
     loop {
         // Update the snake and render it
         let frame = {
