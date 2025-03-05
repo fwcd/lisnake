@@ -6,13 +6,13 @@ use crate::constants::SNAKE_COLOR;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Snake {
-    fields: VecDeque<Pos>,
-    dir: Delta,
+    fields: VecDeque<Pos<i32>>,
+    dir: Delta<i32>,
 }
 
 impl Snake {
     pub fn from_initial_length(length: usize) -> Self {
-        let mut pos: Pos = LIGHTHOUSE_RECT.sample_random().unwrap();
+        let mut pos: Pos<i32> = LIGHTHOUSE_RECT.sample_random().unwrap();
         let dir = Delta::random_cardinal();
 
         let mut fields = VecDeque::new();
@@ -24,9 +24,9 @@ impl Snake {
         Self { fields, dir }
     }
 
-    pub fn head(&self) -> Pos { *self.fields.front().unwrap() }
+    pub fn head(&self) -> Pos<i32> { *self.fields.front().unwrap() }
 
-    pub fn back(&self) -> Pos { *self.fields.back().unwrap() }
+    pub fn back(&self) -> Pos<i32> { *self.fields.back().unwrap() }
 
     pub fn grow(&mut self) {
         self.fields.push_back(LIGHTHOUSE_RECT.wrap(self.back() - self.dir));
@@ -42,7 +42,7 @@ impl Snake {
         self.fields.iter().collect::<HashSet<_>>().len() < self.fields.len()
     }
 
-    pub fn rotate_head(&mut self, dir: Delta) {
+    pub fn rotate_head(&mut self, dir: Delta<i32>) {
         self.dir = dir;
     }
 
@@ -56,7 +56,7 @@ impl Snake {
         self.fields.len()
     }
 
-    pub fn random_fruit_pos(&self) -> Option<Pos> {
+    pub fn random_fruit_pos(&self) -> Option<Pos<i32>> {
         let fields = self.fields.iter().collect::<HashSet<_>>();
         if fields.len() >= LIGHTHOUSE_SIZE {
             None

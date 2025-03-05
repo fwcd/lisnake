@@ -36,7 +36,7 @@ async fn main() -> Result<()> {
     let auth = Authentication::new(&args.username, &args.token);
     let state = Arc::new(Mutex::new(State::new()));
 
-    let mut lh = Lighthouse::connect_with_tokio_to(&args.url, auth).await?;
+    let lh = Lighthouse::connect_with_tokio_to(&args.url, auth).await?;
     info!("Connected to the Lighthouse server");
 
     let stream = lh.stream_model().await?;

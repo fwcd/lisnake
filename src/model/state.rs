@@ -8,7 +8,7 @@ use super::Snake;
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct State {
     pub snake: Snake,
-    pub fruit: Pos,
+    pub fruit: Pos<i32>,
 }
 
 impl State {
