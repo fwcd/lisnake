@@ -1,6 +1,6 @@
 [package]
 name = "lisnake"
-version = "1.0.3"
+version = "2.0.0"
 description = "Snake for Project Lighthouse"
 edition = "2021"
 license = "MIT"
