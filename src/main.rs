@@ -44,8 +44,8 @@ async fn main() -> Result<()> {
     let updater_handle = task::spawn(updater::run(lh, state.clone()));
     let controller_handle = task::spawn(controller::run(input, state));
 
-    updater_handle.await.unwrap()?;
-    controller_handle.await.unwrap()?;
+    updater_handle.await??;
+    controller_handle.await??;
 
     Ok(())
 }
