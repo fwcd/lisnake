@@ -1,21 +1,22 @@
 use std::collections::{HashSet, VecDeque};
 
-use lighthouse_client::protocol::{Delta, Frame, Pos, LIGHTHOUSE_RECT};
+use lighthouse_client::protocol::{Color, Delta, Frame, Pos, LIGHTHOUSE_RECT};
 
-use crate::constants::{SNAKE_COLOR, SNAKE_INITIAL_LENGTH};
+use crate::constants::SNAKE_INITIAL_LENGTH;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Snake {
     fields: VecDeque<Pos<i32>>,
     dir: Delta<i32>,
+    color: Color,
 }
 
 impl Snake {
-    pub fn new() -> Self {
-        Self::from_initial_length(SNAKE_INITIAL_LENGTH)
+    pub fn new(color: Color) -> Self {
+        Self::with_length(SNAKE_INITIAL_LENGTH, color)
     }
 
-    pub fn from_initial_length(length: usize) -> Self {
+    pub fn with_length(length: usize, color: Color) -> Self {
         let mut pos: Pos<i32> = LIGHTHOUSE_RECT.sample_random().unwrap();
         let dir = Delta::random_cardinal();
 
@@ -25,7 +26,7 @@ impl Snake {
             pos = LIGHTHOUSE_RECT.wrap(pos - dir);
         }
 
-        Self { fields, dir }
+        Self { fields, dir, color }
     }
 
     pub fn head(&self) -> Pos<i32> { *self.fields.front().unwrap() }
@@ -62,7 +63,7 @@ impl Snake {
 
     pub fn render_to(&self, frame: &mut Frame) {
         for field in &self.fields {
-            frame[*field] = SNAKE_COLOR;
+            frame[*field] = self.color;
         }
     }
 
@@ -76,5 +77,9 @@ impl Snake {
 
     pub fn field_set(&self) -> HashSet<Pos<i32>> {
         self.fields.iter().cloned().collect::<HashSet<_>>()
+    }
+
+    pub fn color(&self) -> Color {
+        self.color
     }
 }

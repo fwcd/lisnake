@@ -4,21 +4,29 @@ use lighthouse_client::protocol::{Frame, Pos, LIGHTHOUSE_COLS, LIGHTHOUSE_ROWS};
 use rand::seq::IndexedRandom;
 use tracing::info;
 
-use crate::constants::FRUIT_COLOR;
+use crate::constants::{FRUIT_COLOR, SNAKE_COLORS};
 
 use super::Snake;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct State {
     snakes: Vec<Snake>,
-    fruit: Pos<i32>,
+    fruit: Option<Pos<i32>>,
 }
 
 impl State {
+    pub fn empty() -> Self {
+        Self {
+            snakes: Vec::new(),
+            fruit: None,
+        }
+    }
+
     pub fn new() -> Self {
-        let snakes = vec![Snake::new()];
-        let fruit = Self::random_fruit_pos(&snakes).unwrap();
-        Self { snakes, fruit }
+        let mut state = Self::empty();
+        state.ensure_snakes(1);
+        state.fruit = state.random_fruit_pos();
+        state
     }
 
     pub fn reset(&mut self) {
@@ -27,11 +35,11 @@ impl State {
 
     pub fn respawn(&mut self, i: usize) {
         // TODO: Be smarter about this, i.e. avoid intersecting another snake or the fruit
-        self.snakes[i] = Snake::new();
+        self.snakes[i] = Snake::new(self.snakes[i].color());
     }
 
-    fn random_fruit_pos(snakes: &[Snake]) -> Option<Pos<i32>> {
-        let occupied = snakes.iter().flat_map(|s| s.fields()).collect::<HashSet<_>>();
+    fn random_fruit_pos(&self) -> Option<Pos<i32>> {
+        let occupied = self.snakes.iter().flat_map(|s| s.fields()).collect::<HashSet<_>>();
         let free = (0..LIGHTHOUSE_ROWS)
             .flat_map(|y| (0..LIGHTHOUSE_COLS).map(move |x| Pos::new(x as i32, y as i32)))
             .filter(|pos| !occupied.contains(pos))
@@ -93,12 +101,12 @@ impl State {
     }
 
     fn check_fruits(&mut self) {
-        if let Some((i, snake)) = self.snakes.iter_mut().enumerate().find(|(_, s)| s.head() == self.fruit) {
+        if let Some((i, snake)) = self.snakes.iter_mut().enumerate().find(|(_, s)| Some(s.head()) == self.fruit) {
             snake.grow();
             let length = snake.len();
             info! { %length, "Snake {} grew", i + 1 };
-            if let Some(fruit) = Self::random_fruit_pos(&self.snakes) {
-                self.fruit = fruit;
+            if let Some(fruit) = self.random_fruit_pos() {
+                self.fruit = Some(fruit);
             } else {
                 info!("Snake {} wins!", i + 1);
                 self.reset();
@@ -109,7 +117,10 @@ impl State {
     pub fn render(&self) -> Frame {
         let mut frame = Frame::empty();
 
-        frame[self.fruit] = FRUIT_COLOR;
+        if let Some(fruit) = self.fruit {
+            frame[fruit] = FRUIT_COLOR;
+        }
+
         for snake in &self.snakes {
             snake.render_to(&mut frame);
         }
@@ -120,7 +131,7 @@ impl State {
     pub fn ensure_snakes(&mut self, count: usize) {
         while self.snakes.len() < count {
             // TODO: Be smarter about this, i.e. avoid intersecting another snake or the fruit
-            self.snakes.push(Snake::new());
+            self.snakes.push(Snake::new(SNAKE_COLORS[self.snakes.len() % SNAKE_COLORS.len()]));
         }
     }
 
