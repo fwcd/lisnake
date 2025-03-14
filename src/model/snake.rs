@@ -1,8 +1,8 @@
 use std::collections::{HashSet, VecDeque};
 
-use lighthouse_client::protocol::{Delta, Frame, Pos, LIGHTHOUSE_RECT, LIGHTHOUSE_SIZE};
+use lighthouse_client::protocol::{Delta, Frame, Pos, LIGHTHOUSE_RECT};
 
-use crate::constants::SNAKE_COLOR;
+use crate::constants::{SNAKE_COLOR, SNAKE_INITIAL_LENGTH};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Snake {
@@ -11,6 +11,10 @@ pub struct Snake {
 }
 
 impl Snake {
+    pub fn new() -> Self {
+        Self::from_initial_length(SNAKE_INITIAL_LENGTH)
+    }
+
     pub fn from_initial_length(length: usize) -> Self {
         let mut pos: Pos<i32> = LIGHTHOUSE_RECT.sample_random().unwrap();
         let dir = Delta::random_cardinal();
@@ -39,7 +43,17 @@ impl Snake {
     }
 
     pub fn intersects_itself(&self) -> bool {
-        self.fields.iter().collect::<HashSet<_>>().len() < self.fields.len()
+        self.field_set().len() < self.fields.len()
+    }
+
+    pub fn intersects(&self, other: &Snake) -> bool {
+        let own_fields = self.field_set();
+        let other_fields = other.field_set();
+        !own_fields.is_disjoint(&other_fields)
+    }
+
+    pub fn contains(&self, pos: Pos<i32>) -> bool {
+        self.fields.contains(&pos)
     }
 
     pub fn rotate_head(&mut self, dir: Delta<i32>) {
@@ -56,17 +70,11 @@ impl Snake {
         self.fields.len()
     }
 
-    pub fn random_fruit_pos(&self) -> Option<Pos<i32>> {
-        let fields = self.fields.iter().collect::<HashSet<_>>();
-        if fields.len() >= LIGHTHOUSE_SIZE {
-            None
-        } else {
-            loop {
-                let pos = LIGHTHOUSE_RECT.sample_random().unwrap();
-                if !fields.contains(&pos) {
-                    break Some(pos);
-                }
-            }
-        }
+    pub fn fields(&self) -> &VecDeque<Pos<i32>> {
+        &self.fields
+    }
+
+    pub fn field_set(&self) -> HashSet<Pos<i32>> {
+        self.fields.iter().cloned().collect::<HashSet<_>>()
     }
 }
