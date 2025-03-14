@@ -47,12 +47,6 @@ impl Snake {
         self.field_set().len() < self.fields.len()
     }
 
-    pub fn intersects(&self, other: &Snake) -> bool {
-        let own_fields = self.field_set();
-        let other_fields = other.field_set();
-        !own_fields.is_disjoint(&other_fields)
-    }
-
     pub fn contains(&self, pos: Pos<i32>) -> bool {
         self.fields.contains(&pos)
     }
