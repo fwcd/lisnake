@@ -81,7 +81,7 @@ impl State {
                     let snake1 = &self.snakes[i];
                     let snake2 = &self.snakes[j];
 
-                    break 'outer if snake1.head() == snake2.head() {
+                    if let Some(loser) = if snake1.head() == snake2.head() {
                         // Decide randomly which snake dies
                         Some(if rand::random() { i } else { j })
                     } else if snake1.contains(snake2.head()) {
@@ -90,6 +90,8 @@ impl State {
                         Some(i) // Snake 1 dies
                     } else {
                         None
+                    } {
+                        break 'outer Some(loser);
                     };
                 }
             }
