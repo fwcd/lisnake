@@ -699,7 +699,7 @@ checksum = "01cda141df6706de531b6c46c3a33ecca755538219bd484262fa09410c13539c"
 
 [[package]]
 name = "lisnake"
-version = "4.0.1"
+version = "4.0.2"
 dependencies = [
  "anyhow",
  "clap",
